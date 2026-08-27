@@ -147,24 +147,26 @@ export default function ResultsPage() {
     <div className="h-full flex flex-col min-h-0">
       <SummaryBar summary={result.summary} />
 
-      <div className="lg:hidden flex border-b border-border bg-card px-4 pt-2 gap-1">
-        {[
-          { key: "questions", label: "Questions", icon: ListChecks },
-          { key: "answers", label: "Answer Sheet", icon: FileText },
-        ].map(({ key, label, icon: Icon }) => (
-          <button
-            key={key}
-            onClick={() => setMobileTab(key)}
-            className={`flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition ${
-              mobileTab === key
-                ? "border-accent text-ink"
-                : "border-transparent text-muted"
-            }`}
-          >
-            <Icon size={15} />
-            {label}
-          </button>
-        ))}
+      <div className="lg:hidden bg-card border-b border-border px-4 py-2.5">
+        <div className="flex bg-surface rounded-full p-1 gap-1">
+          {[
+            { key: "questions", label: "Questions", icon: ListChecks },
+            { key: "answers", label: "Answer Sheet", icon: FileText },
+          ].map(({ key, label, icon: Icon }) => (
+            <button
+              key={key}
+              onClick={() => setMobileTab(key)}
+              className={`flex-1 flex items-center justify-center gap-1.5 text-sm font-medium rounded-full py-2 transition ${
+                mobileTab === key
+                  ? "bg-card text-ink shadow-sm"
+                  : "text-muted hover:text-ink"
+              }`}
+            >
+              <Icon size={15} />
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[380px_1fr]">
@@ -173,14 +175,17 @@ export default function ResultsPage() {
             mobileTab === "answers" ? "hidden" : ""
           } lg:block border-r border-border overflow-y-auto p-4 flex-col gap-2 lg:flex`}
         >
-          <div className="flex items-center justify-between gap-2 px-1 mb-2">
-            <p className="text-xs font-bold text-ink uppercase tracking-wide">
-              Questions Extracted ({result.questions.length})
-            </p>
+          <div className="flex items-center justify-between gap-2 bg-card border border-border rounded-xl px-3 py-2.5 mb-3">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <ListChecks size={14} className="text-accent shrink-0" />
+              <p className="text-xs font-bold text-ink uppercase tracking-wide truncate">
+                Questions Extracted ({result.questions.length})
+              </p>
+            </div>
             {expandableIds.length > 0 && (
               <button
                 onClick={toggleExpandAll}
-                className="flex items-center gap-1.5 text-xs font-medium text-ink bg-card border border-border rounded-full px-3 py-1.5 hover:border-accent/50 hover:bg-accent-soft/40 transition shrink-0"
+                className="flex items-center gap-1.5 text-xs font-medium text-ink bg-surface border border-border rounded-full px-3 py-1.5 hover:border-accent/50 hover:bg-accent-soft/40 transition shrink-0"
               >
                 {allExpanded ? <ChevronsDownUp size={13} /> : <ChevronsUpDown size={13} />}
                 {allExpanded ? "Collapse all" : "Expand all"}
