@@ -11,6 +11,8 @@ const upload = multer({
   limits: { fileSize: 25 * 1024 * 1024, files: 20 },
 });
 
+const MAX_PAGES_PER_DOCUMENT = 15;
+
 const router = Router();
 
 router.post(
@@ -29,9 +31,6 @@ router.post(
           .json({ error: "Both questionPaper and answerSheet files are required." });
       }
 
-      const id = uuid();
-      const exam = createExam(id);
-
       const questionPages = (
         await Promise.all(questionFiles.map((f) => rasterizeFile(f)))
       ).flat();
@@ -39,6 +38,17 @@ router.post(
         await Promise.all(answerFiles.map((f) => rasterizeFile(f)))
       ).flat();
 
+      if (
+        questionPages.length > MAX_PAGES_PER_DOCUMENT ||
+        answerPages.length > MAX_PAGES_PER_DOCUMENT
+      ) {
+        return res.status(400).json({
+          error: `Each document is limited to ${MAX_PAGES_PER_DOCUMENT} pages (question paper: ${questionPages.length}, answer sheet: ${answerPages.length}).`,
+        });
+      }
+
+      const id = uuid();
+      createExam(id);
       updateExam(id, { questionPages, answerPages, status: "extracting" });
 
       res.status(202).json({ id });

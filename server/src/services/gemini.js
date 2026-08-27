@@ -24,7 +24,7 @@ function pageLabelParts(pages) {
   return parts;
 }
 
-async function generateJson({ systemInstruction, parts, schema }) {
+async function callGemini({ systemInstruction, parts, schema }) {
   const response = await ai.models.generateContent({
     model: MODEL,
     contents: [{ role: "user", parts }],
@@ -35,12 +35,22 @@ async function generateJson({ systemInstruction, parts, schema }) {
       temperature: 0,
     },
   });
-  const text = response.text;
-  try {
-    return JSON.parse(text);
-  } catch (e) {
-    throw new Error(`Gemini returned invalid JSON: ${text?.slice(0, 500)}`);
+  return response.text;
+}
+
+// Gemini's JSON mode is very reliable but occasionally truncates or wraps output
+// (e.g. on transient errors); one retry avoids failing an entire exam over a blip.
+async function generateJson({ systemInstruction, parts, schema }) {
+  let lastError;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const text = await callGemini({ systemInstruction, parts, schema });
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      lastError = new Error(`Gemini returned invalid JSON: ${text?.slice(0, 500)}`);
+    }
   }
+  throw lastError;
 }
 
 const BBOX_SCHEMA = {
@@ -81,6 +91,12 @@ const ANSWERS_SCHEMA = {
         type: "OBJECT",
         properties: {
           matchedQuestionNumber: { type: "STRING", nullable: true },
+          matchMethod: {
+            type: "STRING",
+            enum: ["label", "inferred", "none"],
+            description:
+              "'label' = student explicitly wrote the question number/cue next to this answer. 'inferred' = no explicit label was found; the match is a best guess from content and/or position. 'none' = matchedQuestionNumber is null.",
+          },
           regions: {
             type: "ARRAY",
             items: {
@@ -95,7 +111,7 @@ const ANSWERS_SCHEMA = {
           transcribedText: { type: "STRING" },
           confidence: { type: "NUMBER" },
         },
-        required: ["regions", "transcribedText", "confidence"],
+        required: ["regions", "transcribedText", "confidence", "matchMethod"],
       },
     },
   },
@@ -162,13 +178,17 @@ export async function extractAnswers(answerPages, questions) {
     ...pageLabelParts(answerPages),
   ];
   const result = await generateJson({
-    systemInstruction: `You are a handwritten answer-sheet extraction engine. Given page images of a student's answer sheet (labelled "--- PAGE n ---", 0-indexed) and a reference list of question numbers, identify every distinct answer block written by the student, in the order they appear on the pages (which may be out of order relative to the question paper).
-Rules:
-- For each answer block, determine which question number it answers by reading any label the student wrote (e.g. "Q11(a)", "11 a)", "Ans 3"). Match it to the closest entry in the reference question list (numbers must match the reference list's format exactly, e.g. "11(a)"). If you cannot confidently match it to any question in the list, set matchedQuestionNumber to null.
-- If a single answer's handwriting continues across multiple pages (no new question number starts in between), represent it as ONE answer entry with multiple entries in "regions" (one per page it spans).
-- "regions[].page" is the 0-indexed page number, "regions[].bbox" is [ymin, xmin, ymax, xmax] normalized 0-1000 tightly bounding that portion of the answer's handwriting on that page.
-- "transcribedText" is your best-effort transcription of the handwritten answer (used for grading later), in the student's language.
-- "confidence" is 0-1, your confidence in the question-number match (irrelevant/low if matchedQuestionNumber is null).
+    systemInstruction: `You are a handwritten answer-sheet extraction engine. Handwriting quality varies a lot — some students write neatly and label every answer, others scrawl, skip labels, cross things out, or squeeze corrections into margins. Do your best with all of these. Given page images of a student's answer sheet (labelled "--- PAGE n ---", 0-indexed) and a reference list of question numbers, identify every distinct answer block written by the student, in the order they appear on the pages (which may be out of order relative to the question paper).
+
+Matching rules (try in this order):
+1. LABEL MATCH: look for a label the student wrote (e.g. "Q11(a)", "11 a)", "Ans 3", "3)"). If found and it matches an entry in the reference list, set matchedQuestionNumber to that entry's exact format, matchMethod "label", and confidence 0.85-1.0.
+2. INFERRED MATCH: if there is no label, but the answer's content clearly matches the subject of one specific unanswered question in the reference list (e.g. it works through the exact calculation or definition that question asks for), AND/OR its position on the page follows logically after an already-matched answer in printed sequence, set matchedQuestionNumber to your best guess, matchMethod "inferred", and a HONEST confidence between 0.3 and 0.7 reflecting how sure you really are. Never report high confidence for a guess.
+3. NO MATCH: if you cannot find a label and cannot reasonably infer the question from content or position, set matchedQuestionNumber to null, matchMethod "none", confidence 0.
+
+Other rules:
+- If a single answer's handwriting continues across multiple pages (no new question number/topic starts in between), represent it as ONE answer entry with multiple entries in "regions" (one per page it spans).
+- "regions[].page" is the 0-indexed page number, "regions[].bbox" is [ymin, xmin, ymax, xmax] normalized 0-1000 tightly bounding that portion of the answer's handwriting on that page (draw it around what is legible even if some words inside aren't).
+- "transcribedText" is your best-effort transcription of the handwritten answer (used for grading later), in the student's language. Transcribe everything you can read; for genuinely illegible words use "[illegible]" inline rather than guessing content that changes the meaning. Ignore crossed-out/struck-through text in the transcription (the student rejected it) unless nothing else is legible.
 - Do not invent answers that are not present. Do not merge two different questions' answers into one entry.
 - Output strict JSON matching the schema. No commentary.`,
     parts,

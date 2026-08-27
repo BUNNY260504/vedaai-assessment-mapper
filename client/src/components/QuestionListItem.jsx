@@ -1,3 +1,5 @@
+import { AlertTriangle } from "lucide-react";
+
 const STATUS_STYLES = {
   correct: "bg-emerald-50 text-emerald-700 border-emerald-200",
   partial: "bg-amber-50 text-amber-700 border-amber-200",
@@ -42,9 +44,25 @@ export default function QuestionListItem({ question, active, onClick }) {
     >
       <div className="flex items-center justify-between gap-2 mb-1">
         <span className="font-semibold text-sm">{question.number}</span>
-        <StatusBadge question={question} />
+        <div className="flex items-center gap-1.5">
+          {question.needsReview && (
+            <span
+              title="This match was inferred, not explicitly labelled by the student — please verify"
+              className="flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full border bg-amber-50 text-amber-700 border-amber-200"
+            >
+              <AlertTriangle size={11} />
+              Verify
+            </span>
+          )}
+          <StatusBadge question={question} />
+        </div>
       </div>
       <p className="text-xs text-muted line-clamp-2">{question.text}</p>
+      {question.needsReview && active && (
+        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5 mt-2">
+          The student didn&apos;t label this answer — we matched it by content/position. Double-check the highlighted region is correct.
+        </p>
+      )}
       {question.grading?.feedback && active && (
         <p className="text-xs text-ink/70 mt-2 border-t border-border pt-2">
           {question.grading.feedback}
