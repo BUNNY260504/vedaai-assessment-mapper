@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   ListChecks,
   FileText,
@@ -21,6 +21,7 @@ import { findLibraryEntry, saveToLibrary } from "../lib/library.js";
 
 export default function ResultsPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [result, setResult] = useState(null);
   const [selected, setSelected] = useState(null); // { kind: 'question'|'unmatched', item }
   const [loading, setLoading] = useState(true);
@@ -179,7 +180,11 @@ export default function ResultsPage() {
     setShowSaveModal(false);
     const proceed = pendingProceedRef.current;
     pendingProceedRef.current = null;
-    if (proceed) proceed();
+    if (proceed) {
+      proceed();
+    } else {
+      navigate("/library");
+    }
   }
 
   function handleCancelSave() {
