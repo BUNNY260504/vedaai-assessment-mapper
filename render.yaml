@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: vedaai-assessment-mapper
+    runtime: node
+    plan: free
+    buildCommand: cd client && npm install && npm run build && cd ../server && npm install
+    startCommand: cd server && npm start
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.6-flash

@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "node --watch src/index.js",
     "start": "node src/index.js"
