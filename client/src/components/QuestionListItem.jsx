@@ -23,13 +23,15 @@ function ScorePill({ question }) {
       </span>
     );
   }
+  const statusLabel = g.status.charAt(0).toUpperCase() + g.status.slice(1);
   return (
     <span
-      className={`text-sm font-bold px-3 py-1 rounded-full whitespace-nowrap ${
+      className={`text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap ${
         SCORE_PILL_STYLES[g.status] || SCORE_PILL_STYLES.ungraded
       }`}
     >
-      {g.maxMarks != null ? `${g.marksAwarded}/${g.maxMarks}` : g.status}
+      {statusLabel}
+      {g.maxMarks != null ? ` · ${g.marksAwarded}/${g.maxMarks}` : ""}
     </span>
   );
 }
@@ -57,7 +59,7 @@ export default function QuestionListItem({ question, active, expanded, onClick, 
         onKeyDown={handleKeyDown}
         className="w-full text-left cursor-pointer flex items-start gap-3"
       >
-        <div className="min-w-[44px] h-11 px-2 rounded-full bg-accent text-white font-bold flex items-center justify-center shrink-0">
+        <div className="min-w-[34px] h-[34px] px-1.5 rounded-full bg-accent text-white font-bold text-xs flex items-center justify-center shrink-0">
           {question.number}
         </div>
         <p className="flex-1 min-w-0 text-xs font-semibold text-ink leading-snug pt-2">
@@ -100,7 +102,7 @@ export default function QuestionListItem({ question, active, expanded, onClick, 
       )}
 
       {hasFeedback && expanded && (
-        <div className="mt-3 bg-surface rounded-xl p-4">
+        <div className="mt-3 bg-white border border-border rounded-xl p-4">
           <p className="font-bold text-sm text-ink mb-1.5">AI Feedback</p>
           <p className="text-sm text-ink/80 leading-relaxed">{question.grading.feedback}</p>
         </div>
