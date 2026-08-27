@@ -1,32 +1,25 @@
-import { FileQuestion } from "lucide-react";
+import { Info } from "lucide-react";
 import PageWithHighlight from "./PageWithHighlight.jsx";
 
-export default function AnswerSheetViewer({ examId, regions, emptyMessage, status, zoom = 100 }) {
-  if (!regions || regions.length === 0) {
-    return (
-      <div className="h-full flex flex-col items-center justify-center text-center text-muted p-8">
-        <FileQuestion size={32} className="mb-3 opacity-60" />
-        <p className="text-sm max-w-xs">
-          {emptyMessage || "No answer found on the answer sheet for this question."}
-        </p>
-      </div>
-    );
-  }
-
+export default function AnswerSheetViewer({ examId, page, bbox, status, zoom = 100, note }) {
   return (
-    <div className="flex flex-col gap-4 p-4">
-      {regions.map((r, i) => (
-        <div key={`${r.page}-${i}`} className="shrink-0" style={{ width: `${zoom}%` }}>
-          <PageWithHighlight
-            examId={examId}
-            side="answer"
-            page={r.page}
-            bbox={r.bbox}
-            pageLabel={regions.length > 1 ? `Page ${r.page + 1} · part ${i + 1}` : `Page ${r.page + 1}`}
-            status={status}
-          />
+    <div className="flex flex-col gap-3 p-4">
+      {note && (
+        <div className="flex items-start gap-2 text-xs text-muted bg-card border border-border rounded-lg px-3 py-2">
+          <Info size={14} className="shrink-0 mt-0.5" />
+          <span>{note}</span>
         </div>
-      ))}
+      )}
+      <div className="shrink-0" style={{ width: `${zoom}%` }}>
+        <PageWithHighlight
+          examId={examId}
+          side="answer"
+          page={page}
+          bbox={bbox}
+          pageLabel={`Page ${page + 1}`}
+          status={status}
+        />
+      </div>
     </div>
   );
 }

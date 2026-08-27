@@ -6,6 +6,7 @@ import QuestionListItem from "../components/QuestionListItem.jsx";
 import AnswerSheetViewer from "../components/AnswerSheetViewer.jsx";
 import SummaryBar from "../components/SummaryBar.jsx";
 import ZoomControl from "../components/ZoomControl.jsx";
+import PageSlider from "../components/PageSlider.jsx";
 
 export default function ResultsPage() {
   const { id } = useParams();
@@ -14,6 +15,7 @@ export default function ResultsPage() {
   const [loading, setLoading] = useState(true);
   const [mobileTab, setMobileTab] = useState("questions"); // 'questions' | 'answers'
   const [zoom, setZoom] = useState(100);
+  const [currentPage, setCurrentPage] = useState(0);
 
   useEffect(() => {
     getExamResult(id)
@@ -27,6 +29,16 @@ export default function ResultsPage() {
       })
       .finally(() => setLoading(false));
   }, [id]);
+
+  // Jump the page viewer to wherever the newly selected answer lives.
+  useEffect(() => {
+    if (!selected) return;
+    const regs =
+      selected.kind === "question"
+        ? selected.item.answer?.regions || []
+        : selected.item?.regions || [];
+    setCurrentPage(regs[0]?.page ?? 0);
+  }, [selected]);
 
   if (loading) {
     return <div className="p-8 text-center text-muted">Loading…</div>;
@@ -42,6 +54,14 @@ export default function ResultsPage() {
       : selected?.item?.regions || [];
   const highlightStatus =
     selected?.kind === "question" ? selected.item.grading?.status : undefined;
+  const currentRegion = regions.find((r) => r.page === currentPage);
+
+  let note;
+  if (selected?.kind === "question" && regions.length === 0) {
+    note = "This question was not answered on the answer sheet — use the page navigator to check manually.";
+  } else if (regions.length > 1) {
+    note = `This answer spans ${regions.length} pages — use the page navigator to see every part.`;
+  }
 
   function select(next) {
     setSelected(next);
@@ -120,24 +140,26 @@ export default function ResultsPage() {
             mobileTab === "questions" ? "hidden" : ""
           } lg:block overflow-auto bg-surface`}
         >
-          {regions.length > 0 && (
-            <div className="sticky top-0 z-10 flex items-center justify-between gap-2 px-4 py-2 border-b border-border bg-card">
-              <span className="text-xs font-medium text-muted truncate">
-                {selected?.kind === "question" ? selected.item.number : "Unmatched answer"}
-              </span>
+          <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-2 px-4 py-2 border-b border-border bg-card">
+            <span className="text-xs font-medium text-muted truncate">
+              {selected?.kind === "question" ? selected.item.number : "Unmatched answer"}
+            </span>
+            <div className="flex items-center gap-3">
+              <PageSlider
+                page={currentPage}
+                pageCount={result.answerPageCount}
+                onChange={setCurrentPage}
+              />
               <ZoomControl zoom={zoom} onChange={setZoom} />
             </div>
-          )}
+          </div>
           <AnswerSheetViewer
             examId={result.id}
-            regions={regions}
+            page={currentPage}
+            bbox={currentRegion?.bbox}
             status={highlightStatus}
             zoom={zoom}
-            emptyMessage={
-              selected?.kind === "question"
-                ? "This question was not answered on the answer sheet."
-                : undefined
-            }
+            note={note}
           />
         </div>
       </div>

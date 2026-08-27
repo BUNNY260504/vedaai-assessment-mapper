@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutGrid,
   Users,
@@ -79,10 +79,12 @@ export default function Shell({ children }) {
             collapsed ? "flex-col gap-2" : "justify-between px-2"
           }`}
         >
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2 min-w-0" aria-label="Go to upload page">
             <LogoMark />
-            {!collapsed && <span className="font-semibold text-lg tracking-tight">VedaAI</span>}
-          </div>
+            {!collapsed && (
+              <span className="font-semibold text-lg tracking-tight truncate">VedaAI</span>
+            )}
+          </Link>
           <button
             onClick={() => setCollapsed((c) => !c)}
             className="w-7 h-7 shrink-0 flex items-center justify-center rounded-md text-muted hover:bg-surface hover:text-ink transition"
@@ -102,10 +104,15 @@ export default function Shell({ children }) {
           />
           <aside className="absolute inset-y-0 left-0 w-72 max-w-[85vw] bg-card px-4 py-5 flex flex-col shadow-xl">
             <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
+              <Link
+                to="/"
+                onClick={() => setDrawerOpen(false)}
+                className="flex items-center gap-2"
+                aria-label="Go to upload page"
+              >
                 <LogoMark />
                 <span className="font-semibold text-lg tracking-tight">VedaAI</span>
-              </div>
+              </Link>
               <button
                 onClick={() => setDrawerOpen(false)}
                 className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface transition"
