@@ -1,12 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { ListChecks, FileText, ChevronsDownUp, ChevronsUpDown } from "lucide-react";
+import { ListChecks, FileText, ChevronsDownUp, ChevronsUpDown, Save, Check } from "lucide-react";
 import { getExamResult } from "../lib/api.js";
 import QuestionListItem from "../components/QuestionListItem.jsx";
 import AnswerSheetViewer from "../components/AnswerSheetViewer.jsx";
 import SummaryBar from "../components/SummaryBar.jsx";
 import ZoomControl from "../components/ZoomControl.jsx";
 import PageSlider from "../components/PageSlider.jsx";
+import SaveToLibraryModal from "../components/SaveToLibraryModal.jsx";
+import { usePageActions } from "../lib/PageActionsContext.jsx";
+import { findLibraryEntry, saveToLibrary } from "../lib/library.js";
 
 export default function ResultsPage() {
   const { id } = useParams();
@@ -18,6 +21,36 @@ export default function ResultsPage() {
   const [currentPage, setCurrentPage] = useState(0);
   const [manualPage, setManualPage] = useState(false);
   const [expandedIds, setExpandedIds] = useState(() => new Set());
+
+  const existingEntry = findLibraryEntry(id);
+  const [saved, setSaved] = useState(!!existingEntry);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const pendingProceedRef = useRef(null);
+  const { setHeaderAction, setBackGuard, markNotified } = usePageActions();
+
+  useEffect(() => {
+    setHeaderAction(
+      <button
+        onClick={() => setShowSaveModal(true)}
+        className="flex items-center gap-1.5 rounded-lg bg-accent text-white text-sm font-semibold px-4 py-2 hover:opacity-90 transition"
+      >
+        {saved ? <Check size={15} /> : <Save size={15} />}
+        {saved ? "Saved" : "Save"}
+      </button>
+    );
+    setBackGuard((proceed) => {
+      if (saved) {
+        proceed();
+        return;
+      }
+      pendingProceedRef.current = proceed;
+      setShowSaveModal(true);
+    });
+    return () => {
+      setHeaderAction(null);
+      setBackGuard(null);
+    };
+  }, [saved, setHeaderAction, setBackGuard]);
 
   useEffect(() => {
     getExamResult(id)
@@ -86,6 +119,21 @@ export default function ResultsPage() {
 
   function toggleExpandAll() {
     setExpandedIds(allExpanded ? new Set() : new Set(expandableIds));
+  }
+
+  function handleSave(studentName) {
+    saveToLibrary({ examId: result.id, studentName, summary: result.summary });
+    setSaved(true);
+    markNotified();
+    setShowSaveModal(false);
+    const proceed = pendingProceedRef.current;
+    pendingProceedRef.current = null;
+    if (proceed) proceed();
+  }
+
+  function handleCancelSave() {
+    setShowSaveModal(false);
+    pendingProceedRef.current = null;
   }
 
   return (
@@ -200,6 +248,13 @@ export default function ResultsPage() {
           />
         </div>
       </div>
+
+      <SaveToLibraryModal
+        open={showSaveModal}
+        defaultName={existingEntry?.studentName || ""}
+        onCancel={handleCancelSave}
+        onSave={handleSave}
+      />
     </div>
   );
 }

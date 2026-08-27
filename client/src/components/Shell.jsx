@@ -13,15 +13,24 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Home,
+  HelpCircle,
+  Bell,
+  ChevronDown,
 } from "lucide-react";
+import { usePageActions } from "../lib/PageActionsContext.jsx";
 
 const NAV = [
   { label: "Home", icon: LayoutGrid, to: "/" },
   { label: "My Classroom", icon: Users },
   { label: "Assignments", icon: FileText },
   { label: "Exams", icon: ClipboardList, to: "/upload" },
-  { label: "My Library", icon: Library },
+  { label: "My Library", icon: Library, to: "/library" },
 ];
+
+const HEADER_LABELS = {
+  "/": "Home",
+  "/library": "My Library",
+};
 
 function isActive(to, pathname) {
   if (!to) return false;
@@ -30,7 +39,7 @@ function isActive(to, pathname) {
 
 function backTargetFor(pathname) {
   if (pathname === "/") return null;
-  if (pathname === "/upload") return "/";
+  if (pathname === "/upload" || pathname === "/library") return "/";
   return "/upload"; // processing / results pages
 }
 
@@ -95,9 +104,18 @@ export default function Shell({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
   const backTarget = backTargetFor(location.pathname);
-  const headerLabel = location.pathname === "/" ? "Home" : "Exams";
+  const headerLabel = HEADER_LABELS[location.pathname] || "Exams";
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const { headerAction, backGuard, hasNotification } = usePageActions();
+
+  function handleBack() {
+    if (backGuard) {
+      backGuard(() => navigate(backTarget));
+    } else {
+      navigate(backTarget);
+    }
+  }
 
   return (
     <div className="h-screen flex bg-surface overflow-hidden">
@@ -166,7 +184,7 @@ export default function Shell({ children }) {
         <header className="flex items-center gap-3 px-4 md:px-6 py-4 border-b border-border bg-card">
           {backTarget ? (
             <button
-              onClick={() => navigate(backTarget)}
+              onClick={handleBack}
               className="w-9 h-9 flex items-center justify-center rounded-full bg-surface hover:bg-border transition"
               aria-label="Back"
             >
@@ -176,6 +194,42 @@ export default function Shell({ children }) {
             <Home size={18} className="text-muted" />
           )}
           <span className="text-muted font-medium flex-1">{headerLabel}</span>
+
+          {headerAction}
+
+          <div className="hidden md:flex items-center gap-2">
+            <button
+              className="w-9 h-9 rounded-full bg-surface hover:bg-border flex items-center justify-center transition"
+              aria-label="Help"
+            >
+              <HelpCircle size={18} className="text-ink" />
+            </button>
+            <button
+              className="relative w-9 h-9 rounded-full bg-surface hover:bg-border flex items-center justify-center transition"
+              aria-label="Notifications"
+            >
+              <Bell size={18} className="text-ink" />
+              {hasNotification && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500" />
+              )}
+            </button>
+            <button
+              className="w-9 h-9 rounded-full bg-surface hover:bg-border flex items-center justify-center transition"
+              aria-label="AI Assistant"
+            >
+              <Sparkles size={18} className="text-ink" />
+            </button>
+            <div className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full border border-border">
+              <div className="w-7 h-7 rounded-full bg-ink flex items-center justify-center text-white text-[11px] font-semibold shrink-0">
+                MR
+              </div>
+              <span className="text-sm font-medium text-ink whitespace-nowrap">
+                Madhur Rastogi
+              </span>
+              <ChevronDown size={16} className="text-muted" />
+            </div>
+          </div>
+
           <button
             onClick={() => setDrawerOpen(true)}
             className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface transition md:hidden"
