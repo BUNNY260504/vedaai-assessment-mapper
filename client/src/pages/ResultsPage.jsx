@@ -19,7 +19,8 @@ export default function ResultsPage() {
   const [mobileTab, setMobileTab] = useState("questions"); // 'questions' | 'answers'
   const [zoom, setZoom] = useState(100);
   const [currentPage, setCurrentPage] = useState(0);
-  const [manualPage, setManualPage] = useState(false);
+  const [scrollRequest, setScrollRequest] = useState(null);
+  const scrollTokenRef = useRef(0);
   const [expandedIds, setExpandedIds] = useState(() => new Set());
 
   const existingEntry = findLibraryEntry(id);
@@ -72,17 +73,6 @@ export default function ResultsPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  // Jump the page viewer to wherever the newly selected answer lives.
-  useEffect(() => {
-    if (!selected) return;
-    const regs =
-      selected.kind === "question"
-        ? selected.item.answer?.regions || []
-        : selected.item?.regions || [];
-    setCurrentPage(regs[0]?.page ?? 0);
-    setManualPage(false);
-  }, [selected]);
-
   if (loading) {
     return <div className="p-8 text-center text-muted">Loading…</div>;
   }
@@ -97,19 +87,20 @@ export default function ResultsPage() {
       : selected?.item?.regions || [];
   const highlightStatus =
     selected?.kind === "question" ? selected.item.grading?.status : undefined;
-  const currentRegion = regions.find((r) => r.page === currentPage);
-  const isUnanswered = selected?.kind === "question" && regions.length === 0 && !manualPage;
-
-  let note;
-  if (selected?.kind === "question" && regions.length === 0 && manualPage) {
-    note = "This question has no matched answer — you're browsing the answer sheet manually.";
-  } else if (regions.length > 1) {
-    note = `This answer spans ${regions.length} pages — use the page navigator to see every part.`;
-  }
+  const isUnanswered = selected?.kind === "question" && regions.length === 0;
 
   function select(next) {
     setSelected(next);
     setMobileTab("answers");
+  }
+
+  // Explicit page jump, used by the prev/next chevrons. Selection-driven
+  // jumps are instead handled by PageWithHighlight itself, which centers on
+  // its own highlight whenever the bbox it receives changes.
+  function requestScrollToPage(page) {
+    scrollTokenRef.current += 1;
+    setScrollRequest({ page, token: scrollTokenRef.current });
+    setCurrentPage(page);
   }
 
   function toggleExpand(qid) {
@@ -234,29 +225,25 @@ export default function ResultsPage() {
           } lg:block overflow-auto bg-surface`}
         >
           <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-2 px-4 py-2 bg-ink">
-            <span className="text-xs font-medium text-white/80 truncate">
-              {selected?.kind === "question" ? selected.item.number : "Unmatched answer"}
-            </span>
+            <span className="text-sm font-bold text-white truncate">Answer Sheet</span>
             <div className="flex items-center gap-3">
               <PageSlider
                 page={currentPage}
                 pageCount={result.answerPageCount}
-                onChange={(p) => {
-                  setCurrentPage(p);
-                  setManualPage(true);
-                }}
+                onChange={requestScrollToPage}
               />
               <ZoomControl zoom={zoom} onChange={setZoom} />
             </div>
           </div>
           <AnswerSheetViewer
             examId={result.id}
-            page={currentPage}
-            bbox={currentRegion?.bbox}
+            pageCount={result.answerPageCount}
+            regions={regions}
             status={highlightStatus}
             zoom={zoom}
-            note={note}
             unanswered={isUnanswered}
+            scrollRequest={scrollRequest}
+            onVisiblePageChange={setCurrentPage}
           />
         </div>
       </div>

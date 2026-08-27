@@ -87,11 +87,11 @@ function NavContent({ collapsed, pathname, onNavigate }) {
       <nav className="flex flex-col gap-1">
         {NAV.map(({ label, icon: Icon, to }) => {
           const active = isActive(to, pathname);
-          const className = `flex items-center rounded-xl text-sm ${
+          const className = `flex items-center rounded-xl text-sm font-bold ${
             collapsed ? "justify-center w-10 h-10 mx-auto" : "gap-3 px-3 py-2.5"
           } ${
             active
-              ? "bg-ink text-white font-medium"
+              ? "bg-ink text-white"
               : `text-muted ${to ? "hover:bg-surface/70 cursor-pointer" : "cursor-default"}`
           }`;
           const content = (
@@ -121,7 +121,7 @@ function NavContent({ collapsed, pathname, onNavigate }) {
       <div className="mt-auto pt-4">
         <div
           title={collapsed ? "Settings" : undefined}
-          className={`flex items-center rounded-xl text-sm text-muted hover:bg-surface/70 cursor-pointer mb-2 ${
+          className={`flex items-center rounded-xl text-sm font-bold text-muted hover:bg-surface/70 cursor-pointer mb-2 ${
             collapsed ? "justify-center w-10 h-10 mx-auto" : "gap-3 px-3 py-2.5"
           }`}
         >
@@ -280,7 +280,7 @@ export default function Shell({ children }) {
                 MR
               </div>
               <span className="text-sm font-medium text-ink whitespace-nowrap">
-                Madhur Rastogi
+                Madhukar Reddy
               </span>
               <ChevronDown size={16} className="text-muted" />
             </div>

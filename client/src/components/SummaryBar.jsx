@@ -10,7 +10,7 @@ export default function SummaryBar({ summary }) {
             {summary.totalMarks}
             <span className="text-muted text-base font-normal">/{summary.maxMarks}</span>
           </p>
-          <p className="text-xs text-muted mt-1">Total score</p>
+          <p className="text-xs font-bold text-muted mt-1">Total score</p>
         </div>
         <Stat label="Answered" value={`${summary.answeredCount}/${summary.totalQuestions}`} />
         <Stat label="Correct" value={summary.correctCount} tone="text-emerald-600" />
@@ -19,7 +19,7 @@ export default function SummaryBar({ summary }) {
         <Stat label="Unanswered" value={summary.unansweredCount} tone="text-gray-500" />
       </div>
       {summary.overallFeedback && (
-        <div className="mt-4 flex gap-3 bg-accent-soft/50 border border-accent/20 rounded-xl px-4 py-3 max-w-3xl">
+        <div className="mt-4 flex gap-3 bg-accent-soft/50 border border-accent/20 rounded-xl px-4 py-3">
           <div className="w-8 h-8 rounded-full bg-white border border-accent/30 flex items-center justify-center shrink-0">
             <Sparkles size={15} className="text-accent" />
           </div>
@@ -39,7 +39,7 @@ function Stat({ label, value, tone }) {
   return (
     <div>
       <p className={`text-lg font-semibold leading-none ${tone || ""}`}>{value}</p>
-      <p className="text-xs text-muted mt-1">{label}</p>
+      <p className="text-xs font-bold text-muted mt-1">{label}</p>
     </div>
   );
 }

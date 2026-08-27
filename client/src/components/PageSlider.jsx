@@ -4,7 +4,7 @@ export default function PageSlider({ page, pageCount, onChange }) {
   if (!pageCount || pageCount <= 1) return null;
 
   return (
-    <div className="flex items-center gap-1.5 text-white">
+    <div className="flex items-center gap-1 bg-white/10 border border-white/15 rounded-full px-1 py-1 text-white">
       <button
         onClick={() => onChange(Math.max(0, page - 1))}
         disabled={page <= 0}
@@ -14,18 +14,8 @@ export default function PageSlider({ page, pageCount, onChange }) {
         <ChevronLeft size={15} />
       </button>
 
-      <input
-        type="range"
-        min={0}
-        max={pageCount - 1}
-        value={page}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="w-20 sm:w-28 accent-accent cursor-pointer"
-        aria-label="Answer sheet page"
-      />
-
-      <span className="text-xs font-medium text-white/80 w-14 text-center shrink-0">
-        Page {page + 1}/{pageCount}
+      <span className="text-xs font-bold px-1 whitespace-nowrap">
+        Page {page + 1} of {pageCount}
       </span>
 
       <button
