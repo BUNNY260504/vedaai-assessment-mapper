@@ -1,6 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { ListChecks, FileText, ChevronsDownUp, ChevronsUpDown, Save, Check } from "lucide-react";
+import {
+  ListChecks,
+  FileText,
+  ChevronsDownUp,
+  ChevronsUpDown,
+  Save,
+  Check,
+  GripVertical,
+} from "lucide-react";
 import { getExamResult } from "../lib/api.js";
 import QuestionListItem from "../components/QuestionListItem.jsx";
 import AnswerSheetViewer from "../components/AnswerSheetViewer.jsx";
@@ -22,6 +30,11 @@ export default function ResultsPage() {
   const [scrollRequest, setScrollRequest] = useState(null);
   const scrollTokenRef = useRef(0);
   const [expandedIds, setExpandedIds] = useState(() => new Set());
+
+  const panelsRef = useRef(null);
+  const resizeStateRef = useRef(null);
+  const [panelWidth, setPanelWidth] = useState(380);
+  const [resizing, setResizing] = useState(false);
 
   const existingEntry = findLibraryEntry(id);
   const [saved, setSaved] = useState(!!existingEntry);
@@ -103,6 +116,46 @@ export default function ResultsPage() {
     setCurrentPage(page);
   }
 
+  function handleResizeStart(e) {
+    e.preventDefault();
+    resizeStateRef.current = { startX: e.clientX, startWidth: panelWidth };
+    setResizing(true);
+  }
+
+  useEffect(() => {
+    if (!resizing) return;
+    const MIN_PANEL_WIDTH = 300;
+    const MAX_PANEL_RATIO = 0.7;
+
+    function onMove(e) {
+      const dragState = resizeStateRef.current;
+      if (!dragState || !panelsRef.current) return;
+      const containerWidth = panelsRef.current.clientWidth;
+      const maxWidth = containerWidth * MAX_PANEL_RATIO;
+      const next = Math.min(
+        maxWidth,
+        Math.max(MIN_PANEL_WIDTH, dragState.startWidth + (e.clientX - dragState.startX))
+      );
+      setPanelWidth(next);
+    }
+
+    function onUp() {
+      resizeStateRef.current = null;
+      setResizing(false);
+    }
+
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => {
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+  }, [resizing]);
+
   function toggleExpand(qid) {
     setExpandedIds((prev) => {
       const next = new Set(prev);
@@ -160,11 +213,15 @@ export default function ResultsPage() {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[380px_1fr]">
+      <div
+        ref={panelsRef}
+        className="flex-1 min-h-0 grid grid-cols-1 lg:flex"
+        style={{ "--panel-width": `${panelWidth}px` }}
+      >
         <div
           className={`${
             mobileTab === "answers" ? "hidden" : ""
-          } lg:block border-r border-border overflow-y-auto p-4 flex-col gap-2 lg:flex`}
+          } lg:block border-r border-border overflow-y-auto p-4 flex-col gap-2 lg:flex lg:w-[var(--panel-width)] lg:shrink-0`}
         >
           <div className="flex items-center justify-between gap-2 bg-card border border-border rounded-xl px-3 py-2.5 mb-3">
             <div className="flex items-center gap-1.5 min-w-0">
@@ -220,9 +277,24 @@ export default function ResultsPage() {
         </div>
 
         <div
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="Resize panels"
+          onMouseDown={handleResizeStart}
+          className={`hidden lg:flex w-2.5 shrink-0 cursor-col-resize items-center justify-center transition touch-none ${
+            resizing ? "bg-accent/15" : "hover:bg-accent/10"
+          }`}
+        >
+          <GripVertical
+            size={14}
+            className={`transition ${resizing ? "text-accent" : "text-muted"}`}
+          />
+        </div>
+
+        <div
           className={`${
             mobileTab === "questions" ? "hidden" : ""
-          } lg:block overflow-auto bg-surface`}
+          } lg:block lg:flex-1 lg:min-w-0 overflow-auto bg-surface`}
         >
           <div className="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-2 px-4 py-2 bg-ink">
             <span className="text-sm font-bold text-white truncate">Answer Sheet</span>
