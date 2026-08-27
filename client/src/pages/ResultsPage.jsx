@@ -86,36 +86,6 @@ export default function ResultsPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) {
-    return <div className="p-8 text-center text-muted">Loading…</div>;
-  }
-
-  if (!result) {
-    return <div className="p-8 text-center text-muted">Exam not found.</div>;
-  }
-
-  const regions =
-    selected?.kind === "question"
-      ? selected.item.answer?.regions || []
-      : selected?.item?.regions || [];
-  const highlightStatus =
-    selected?.kind === "question" ? selected.item.grading?.status : undefined;
-  const isUnanswered = selected?.kind === "question" && regions.length === 0;
-
-  function select(next) {
-    setSelected(next);
-    setMobileTab("answers");
-  }
-
-  // Explicit page jump, used by the prev/next chevrons. Selection-driven
-  // jumps are instead handled by PageWithHighlight itself, which centers on
-  // its own highlight whenever the bbox it receives changes.
-  function requestScrollToPage(page) {
-    scrollTokenRef.current += 1;
-    setScrollRequest({ page, token: scrollTokenRef.current });
-    setCurrentPage(page);
-  }
-
   function handleResizeStart(e) {
     e.preventDefault();
     resizeStateRef.current = { startX: e.clientX, startWidth: panelWidth };
@@ -155,6 +125,36 @@ export default function ResultsPage() {
       window.removeEventListener("mouseup", onUp);
     };
   }, [resizing]);
+
+  if (loading) {
+    return <div className="p-8 text-center text-muted">Loading…</div>;
+  }
+
+  if (!result) {
+    return <div className="p-8 text-center text-muted">Exam not found.</div>;
+  }
+
+  const regions =
+    selected?.kind === "question"
+      ? selected.item.answer?.regions || []
+      : selected?.item?.regions || [];
+  const highlightStatus =
+    selected?.kind === "question" ? selected.item.grading?.status : undefined;
+  const isUnanswered = selected?.kind === "question" && regions.length === 0;
+
+  function select(next) {
+    setSelected(next);
+    setMobileTab("answers");
+  }
+
+  // Explicit page jump, used by the prev/next chevrons. Selection-driven
+  // jumps are instead handled by PageWithHighlight itself, which centers on
+  // its own highlight whenever the bbox it receives changes.
+  function requestScrollToPage(page) {
+    scrollTokenRef.current += 1;
+    setScrollRequest({ page, token: scrollTokenRef.current });
+    setCurrentPage(page);
+  }
 
   function toggleExpand(qid) {
     setExpandedIds((prev) => {
