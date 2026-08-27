@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { ListChecks, FileText } from "lucide-react";
+import { ListChecks, FileText, ChevronsDownUp, ChevronsUpDown } from "lucide-react";
 import { getExamResult } from "../lib/api.js";
 import QuestionListItem from "../components/QuestionListItem.jsx";
 import AnswerSheetViewer from "../components/AnswerSheetViewer.jsx";
@@ -16,6 +16,8 @@ export default function ResultsPage() {
   const [mobileTab, setMobileTab] = useState("questions"); // 'questions' | 'answers'
   const [zoom, setZoom] = useState(100);
   const [currentPage, setCurrentPage] = useState(0);
+  const [manualPage, setManualPage] = useState(false);
+  const [expandedIds, setExpandedIds] = useState(() => new Set());
 
   useEffect(() => {
     getExamResult(id)
@@ -38,6 +40,7 @@ export default function ResultsPage() {
         ? selected.item.answer?.regions || []
         : selected.item?.regions || [];
     setCurrentPage(regs[0]?.page ?? 0);
+    setManualPage(false);
   }, [selected]);
 
   if (loading) {
@@ -55,10 +58,11 @@ export default function ResultsPage() {
   const highlightStatus =
     selected?.kind === "question" ? selected.item.grading?.status : undefined;
   const currentRegion = regions.find((r) => r.page === currentPage);
+  const isUnanswered = selected?.kind === "question" && regions.length === 0 && !manualPage;
 
   let note;
-  if (selected?.kind === "question" && regions.length === 0) {
-    note = "This question was not answered on the answer sheet — use the page navigator to check manually.";
+  if (selected?.kind === "question" && regions.length === 0 && manualPage) {
+    note = "This question has no matched answer — you're browsing the answer sheet manually.";
   } else if (regions.length > 1) {
     note = `This answer spans ${regions.length} pages — use the page navigator to see every part.`;
   }
@@ -66,6 +70,22 @@ export default function ResultsPage() {
   function select(next) {
     setSelected(next);
     setMobileTab("answers");
+  }
+
+  function toggleExpand(qid) {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      next.has(qid) ? next.delete(qid) : next.add(qid);
+      return next;
+    });
+  }
+
+  const expandableIds = result.questions.filter((q) => q.grading?.feedback).map((q) => q.id);
+  const allExpanded =
+    expandableIds.length > 0 && expandableIds.every((qid) => expandedIds.has(qid));
+
+  function toggleExpandAll() {
+    setExpandedIds(allExpanded ? new Set() : new Set(expandableIds));
   }
 
   return (
@@ -98,15 +118,28 @@ export default function ResultsPage() {
             mobileTab === "answers" ? "hidden" : ""
           } lg:block border-r border-border overflow-y-auto p-4 flex-col gap-2 lg:flex`}
         >
-          <p className="text-xs font-medium text-muted uppercase tracking-wide px-1 mb-1">
-            Questions Extracted ({result.questions.length})
-          </p>
+          <div className="flex items-center justify-between gap-2 px-1 mb-1">
+            <p className="text-xs font-bold text-muted uppercase tracking-wide">
+              Questions Extracted ({result.questions.length})
+            </p>
+            {expandableIds.length > 0 && (
+              <button
+                onClick={toggleExpandAll}
+                className="flex items-center gap-1 text-[11px] font-medium text-muted hover:text-ink transition shrink-0"
+              >
+                {allExpanded ? <ChevronsDownUp size={12} /> : <ChevronsUpDown size={12} />}
+                {allExpanded ? "Collapse all" : "Expand all"}
+              </button>
+            )}
+          </div>
           {result.questions.map((q) => (
             <QuestionListItem
               key={q.id}
               question={q}
               active={selected?.kind === "question" && selected.item.id === q.id}
+              expanded={expandedIds.has(q.id)}
               onClick={() => select({ kind: "question", item: q })}
+              onToggleExpand={() => toggleExpand(q.id)}
             />
           ))}
 
@@ -140,15 +173,18 @@ export default function ResultsPage() {
             mobileTab === "questions" ? "hidden" : ""
           } lg:block overflow-auto bg-surface`}
         >
-          <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-2 px-4 py-2 border-b border-border bg-card">
-            <span className="text-xs font-medium text-muted truncate">
+          <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-2 px-4 py-2 bg-ink">
+            <span className="text-xs font-medium text-white/80 truncate">
               {selected?.kind === "question" ? selected.item.number : "Unmatched answer"}
             </span>
             <div className="flex items-center gap-3">
               <PageSlider
                 page={currentPage}
                 pageCount={result.answerPageCount}
-                onChange={setCurrentPage}
+                onChange={(p) => {
+                  setCurrentPage(p);
+                  setManualPage(true);
+                }}
               />
               <ZoomControl zoom={zoom} onChange={setZoom} />
             </div>
@@ -160,6 +196,7 @@ export default function ResultsPage() {
             status={highlightStatus}
             zoom={zoom}
             note={note}
+            unanswered={isUnanswered}
           />
         </div>
       </div>
