@@ -10,6 +10,8 @@ import {
   ArrowLeft,
   Menu,
   X,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 
 const NAV = [
@@ -20,34 +22,37 @@ const NAV = [
   { label: "My Library", icon: Library },
 ];
 
-function Logo() {
+function LogoMark() {
   return (
-    <div className="flex items-center gap-2 px-2 mb-6">
-      <div className="w-8 h-8 rounded-lg bg-ink flex items-center justify-center text-white font-bold text-sm">
-        V
-      </div>
-      <span className="font-semibold text-lg tracking-tight">VedaAI</span>
+    <div className="w-8 h-8 shrink-0 rounded-lg bg-ink flex items-center justify-center text-white font-bold text-sm">
+      V
     </div>
   );
 }
 
-function NavContent() {
+function NavContent({ collapsed }) {
   return (
     <>
-      <button className="flex items-center gap-2 justify-center rounded-full border border-accent/40 bg-ink text-white text-sm font-medium py-2.5 mb-6 hover:opacity-90 transition">
-        <Sparkles size={16} className="text-accent" />
-        AI Teacher&apos;s Toolkit
+      <button
+        title={collapsed ? "AI Teacher's Toolkit" : undefined}
+        className={`flex items-center justify-center gap-2 rounded-full border border-accent/40 bg-ink text-white text-sm font-medium mb-6 hover:opacity-90 transition ${
+          collapsed ? "w-10 h-10 mx-auto" : "w-full py-2.5"
+        }`}
+      >
+        <Sparkles size={16} className="text-accent shrink-0" />
+        {!collapsed && "AI Teacher's Toolkit"}
       </button>
       <nav className="flex flex-col gap-1">
         {NAV.map(({ label, icon: Icon, active }) => (
           <div
             key={label}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm cursor-pointer ${
-              active ? "bg-surface font-medium text-ink" : "text-muted hover:bg-surface/70"
-            }`}
+            title={collapsed ? label : undefined}
+            className={`flex items-center rounded-xl text-sm cursor-pointer ${
+              collapsed ? "justify-center w-10 h-10 mx-auto" : "gap-3 px-3 py-2.5"
+            } ${active ? "bg-surface font-medium text-ink" : "text-muted hover:bg-surface/70"}`}
           >
-            <Icon size={18} />
-            {label}
+            <Icon size={18} className="shrink-0" />
+            {!collapsed && label}
           </div>
         ))}
       </nav>
@@ -60,12 +65,33 @@ export default function Shell({ children }) {
   const location = useLocation();
   const showBack = location.pathname !== "/";
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
     <div className="min-h-screen flex bg-surface">
-      <aside className="hidden md:flex w-64 shrink-0 flex-col border-r border-border bg-card px-4 py-5">
-        <Logo />
-        <NavContent />
+      <aside
+        className={`hidden md:flex shrink-0 flex-col border-r border-border bg-card py-5 transition-[width] duration-200 ${
+          collapsed ? "w-20 px-2" : "w-64 px-4"
+        }`}
+      >
+        <div
+          className={`flex items-center mb-6 ${
+            collapsed ? "flex-col gap-2" : "justify-between px-2"
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            <LogoMark />
+            {!collapsed && <span className="font-semibold text-lg tracking-tight">VedaAI</span>}
+          </div>
+          <button
+            onClick={() => setCollapsed((c) => !c)}
+            className="w-7 h-7 shrink-0 flex items-center justify-center rounded-md text-muted hover:bg-surface hover:text-ink transition"
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+          </button>
+        </div>
+        <NavContent collapsed={collapsed} />
       </aside>
 
       {drawerOpen && (
@@ -75,17 +101,20 @@ export default function Shell({ children }) {
             onClick={() => setDrawerOpen(false)}
           />
           <aside className="absolute inset-y-0 left-0 w-72 max-w-[85vw] bg-card px-4 py-5 flex flex-col shadow-xl">
-            <div className="flex items-center justify-between mb-2">
-              <Logo />
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <LogoMark />
+                <span className="font-semibold text-lg tracking-tight">VedaAI</span>
+              </div>
               <button
                 onClick={() => setDrawerOpen(false)}
-                className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface transition -mt-6"
+                className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface transition"
                 aria-label="Close menu"
               >
                 <X size={18} />
               </button>
             </div>
-            <NavContent />
+            <NavContent collapsed={false} />
           </aside>
         </div>
       )}

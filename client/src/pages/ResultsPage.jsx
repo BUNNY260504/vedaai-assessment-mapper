@@ -5,6 +5,7 @@ import { getExamResult } from "../lib/api.js";
 import QuestionListItem from "../components/QuestionListItem.jsx";
 import AnswerSheetViewer from "../components/AnswerSheetViewer.jsx";
 import SummaryBar from "../components/SummaryBar.jsx";
+import ZoomControl from "../components/ZoomControl.jsx";
 
 export default function ResultsPage() {
   const { id } = useParams();
@@ -12,6 +13,7 @@ export default function ResultsPage() {
   const [selected, setSelected] = useState(null); // { kind: 'question'|'unmatched', item }
   const [loading, setLoading] = useState(true);
   const [mobileTab, setMobileTab] = useState("questions"); // 'questions' | 'answers'
+  const [zoom, setZoom] = useState(100);
 
   useEffect(() => {
     getExamResult(id)
@@ -116,17 +118,21 @@ export default function ResultsPage() {
         <div
           className={`${
             mobileTab === "questions" ? "hidden" : ""
-          } lg:block overflow-y-auto bg-surface`}
+          } lg:block overflow-auto bg-surface`}
         >
-          {selected?.kind === "question" && (
-            <p className="lg:hidden text-xs font-medium text-muted px-4 pt-3">
-              {selected.item.number}
-            </p>
+          {regions.length > 0 && (
+            <div className="sticky top-0 z-10 flex items-center justify-between gap-2 px-4 py-2 border-b border-border bg-card">
+              <span className="text-xs font-medium text-muted truncate">
+                {selected?.kind === "question" ? selected.item.number : "Unmatched answer"}
+              </span>
+              <ZoomControl zoom={zoom} onChange={setZoom} />
+            </div>
           )}
           <AnswerSheetViewer
             examId={result.id}
             regions={regions}
             status={highlightStatus}
+            zoom={zoom}
             emptyMessage={
               selected?.kind === "question"
                 ? "This question was not answered on the answer sheet."
