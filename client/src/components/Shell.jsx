@@ -175,7 +175,7 @@ export default function Shell({ children }) {
       >
         <div
           className={`flex items-center mb-6 ${
-            collapsed ? "flex-col gap-2" : "justify-between px-2"
+            collapsed ? "justify-center" : "justify-between px-2"
           }`}
         >
           <Link to="/" className="flex items-center gap-2 min-w-0" aria-label="Go to home page">
@@ -184,15 +184,26 @@ export default function Shell({ children }) {
               <span className="font-semibold text-lg tracking-tight truncate">VedaAI</span>
             )}
           </Link>
-          <button
-            onClick={() => setCollapsed((c) => !c)}
-            className="w-7 h-7 shrink-0 flex items-center justify-center rounded-md text-muted hover:bg-surface hover:text-ink transition"
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
-          </button>
+          {!collapsed && (
+            <button
+              onClick={() => setCollapsed((c) => !c)}
+              className="w-7 h-7 shrink-0 flex items-center justify-center rounded-md text-muted hover:bg-surface hover:text-ink transition"
+              aria-label="Collapse sidebar"
+            >
+              <PanelLeftClose size={16} />
+            </button>
+          )}
         </div>
         <NavContent collapsed={collapsed} pathname={location.pathname} />
+        {collapsed && (
+          <button
+            onClick={() => setCollapsed((c) => !c)}
+            className="mt-3 w-10 h-10 mx-auto shrink-0 flex items-center justify-center rounded-md text-muted hover:bg-surface hover:text-ink transition"
+            aria-label="Expand sidebar"
+          >
+            <PanelLeftOpen size={16} />
+          </button>
+        )}
       </aside>
 
       {drawerOpen && (
@@ -242,7 +253,7 @@ export default function Shell({ children }) {
           ) : (
             <Home size={18} className="text-muted" />
           )}
-          <span className="text-muted font-medium flex-1">{headerLabel}</span>
+          <span className="text-ink font-bold flex-1">{headerLabel}</span>
 
           {headerAction}
 

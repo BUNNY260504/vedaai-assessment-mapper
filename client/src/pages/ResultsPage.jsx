@@ -224,7 +224,7 @@ export default function ResultsPage() {
             mobileTab === "questions" ? "hidden" : ""
           } lg:block overflow-auto bg-surface`}
         >
-          <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-2 px-4 py-2 bg-ink">
+          <div className="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-2 px-4 py-2 bg-ink">
             <span className="text-sm font-bold text-white truncate">Answer Sheet</span>
             <div className="flex items-center gap-3">
               <PageSlider
