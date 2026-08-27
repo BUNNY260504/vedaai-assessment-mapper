@@ -11,7 +11,15 @@ function bboxToStyle(bbox) {
   };
 }
 
-export default function PageWithHighlight({ examId, side, page, bbox, pageLabel }) {
+const HIGHLIGHT_STYLES = {
+  correct: "border-emerald-500 bg-emerald-500/15",
+  partial: "border-amber-500 bg-amber-500/15",
+  incorrect: "border-red-500 bg-red-500/15",
+  neutral: "border-accent bg-accent/15",
+};
+
+export default function PageWithHighlight({ examId, side, page, bbox, pageLabel, status }) {
+  const highlightClass = HIGHLIGHT_STYLES[status] || HIGHLIGHT_STYLES.neutral;
   return (
     <div className="relative rounded-xl overflow-hidden border border-border bg-white">
       {pageLabel && (
@@ -26,7 +34,7 @@ export default function PageWithHighlight({ examId, side, page, bbox, pageLabel 
       />
       {bbox && (
         <div
-          className="absolute border-2 border-accent bg-accent/15 rounded-sm transition-all duration-300"
+          className={`absolute border-2 rounded-sm transition-all duration-300 ${highlightClass}`}
           style={bboxToStyle(bbox)}
         />
       )}

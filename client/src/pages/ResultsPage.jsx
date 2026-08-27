@@ -38,6 +38,8 @@ export default function ResultsPage() {
     selected?.kind === "question"
       ? selected.item.answer?.regions || []
       : selected?.item?.regions || [];
+  const highlightStatus =
+    selected?.kind === "question" ? selected.item.grading?.status : undefined;
 
   function select(next) {
     setSelected(next);
@@ -124,6 +126,7 @@ export default function ResultsPage() {
           <AnswerSheetViewer
             examId={result.id}
             regions={regions}
+            status={highlightStatus}
             emptyMessage={
               selected?.kind === "question"
                 ? "This question was not answered on the answer sheet."

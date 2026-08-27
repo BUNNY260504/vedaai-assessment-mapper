@@ -1,7 +1,7 @@
 import { FileQuestion } from "lucide-react";
 import PageWithHighlight from "./PageWithHighlight.jsx";
 
-export default function AnswerSheetViewer({ examId, regions, emptyMessage }) {
+export default function AnswerSheetViewer({ examId, regions, emptyMessage, status }) {
   if (!regions || regions.length === 0) {
     return (
       <div className="h-full flex flex-col items-center justify-center text-center text-muted p-8">
@@ -23,6 +23,7 @@ export default function AnswerSheetViewer({ examId, regions, emptyMessage }) {
           page={r.page}
           bbox={r.bbox}
           pageLabel={regions.length > 1 ? `Page ${r.page + 1} · part ${i + 1}` : `Page ${r.page + 1}`}
+          status={status}
         />
       ))}
     </div>
