@@ -16,6 +16,8 @@ import {
   HelpCircle,
   Bell,
   ChevronDown,
+  Settings,
+  Shield,
 } from "lucide-react";
 import { usePageActions } from "../lib/PageActionsContext.jsx";
 
@@ -96,6 +98,34 @@ function NavContent({ collapsed, pathname, onNavigate }) {
           );
         })}
       </nav>
+
+      <div className="mt-auto pt-4">
+        <div
+          title={collapsed ? "Settings" : undefined}
+          className={`flex items-center rounded-xl text-sm text-muted hover:bg-surface/70 cursor-pointer mb-2 ${
+            collapsed ? "justify-center w-10 h-10 mx-auto" : "gap-3 px-3 py-2.5"
+          }`}
+        >
+          <Settings size={18} className="shrink-0" />
+          {!collapsed && "Settings"}
+        </div>
+        <div
+          title={collapsed ? "Delhi Public School, Bokaro Steel City" : undefined}
+          className={`bg-surface rounded-2xl ${
+            collapsed ? "p-2 flex justify-center" : "flex items-center gap-3 p-3"
+          }`}
+        >
+          <div className="w-10 h-10 rounded-full bg-white border-2 border-emerald-600 flex items-center justify-center shrink-0">
+            <Shield size={18} className="text-emerald-700" />
+          </div>
+          {!collapsed && (
+            <div className="min-w-0">
+              <p className="font-semibold text-sm truncate">Delhi Public School</p>
+              <p className="text-xs text-muted truncate">Bokaro Steel City</p>
+            </div>
+          )}
+        </div>
+      </div>
     </>
   );
 }

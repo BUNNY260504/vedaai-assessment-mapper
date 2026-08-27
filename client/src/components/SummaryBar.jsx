@@ -1,3 +1,5 @@
+import { Sparkles } from "lucide-react";
+
 export default function SummaryBar({ summary }) {
   if (!summary) return null;
   return (
@@ -17,7 +19,17 @@ export default function SummaryBar({ summary }) {
         <Stat label="Unanswered" value={summary.unansweredCount} tone="text-gray-500" />
       </div>
       {summary.overallFeedback && (
-        <p className="text-sm text-muted mt-3 max-w-3xl">{summary.overallFeedback}</p>
+        <div className="mt-4 flex gap-3 bg-accent-soft/50 border border-accent/20 rounded-xl px-4 py-3 max-w-3xl">
+          <div className="w-8 h-8 rounded-full bg-white border border-accent/30 flex items-center justify-center shrink-0">
+            <Sparkles size={15} className="text-accent" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[11px] font-bold text-accent uppercase tracking-wide mb-1">
+              Overall Performance
+            </p>
+            <p className="text-sm text-ink leading-relaxed">{summary.overallFeedback}</p>
+          </div>
+        </div>
       )}
     </div>
   );

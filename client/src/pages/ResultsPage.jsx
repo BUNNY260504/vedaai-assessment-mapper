@@ -166,16 +166,16 @@ export default function ResultsPage() {
             mobileTab === "answers" ? "hidden" : ""
           } lg:block border-r border-border overflow-y-auto p-4 flex-col gap-2 lg:flex`}
         >
-          <div className="flex items-center justify-between gap-2 px-1 mb-1">
-            <p className="text-xs font-bold text-muted uppercase tracking-wide">
+          <div className="flex items-center justify-between gap-2 px-1 mb-2">
+            <p className="text-xs font-bold text-ink uppercase tracking-wide">
               Questions Extracted ({result.questions.length})
             </p>
             {expandableIds.length > 0 && (
               <button
                 onClick={toggleExpandAll}
-                className="flex items-center gap-1 text-[11px] font-medium text-muted hover:text-ink transition shrink-0"
+                className="flex items-center gap-1.5 text-xs font-medium text-ink bg-card border border-border rounded-full px-3 py-1.5 hover:border-accent/50 hover:bg-accent-soft/40 transition shrink-0"
               >
-                {allExpanded ? <ChevronsDownUp size={12} /> : <ChevronsUpDown size={12} />}
+                {allExpanded ? <ChevronsDownUp size={13} /> : <ChevronsUpDown size={13} />}
                 {allExpanded ? "Collapse all" : "Expand all"}
               </button>
             )}
@@ -193,7 +193,7 @@ export default function ResultsPage() {
 
           {result.unmatchedAnswers?.length > 0 && (
             <>
-              <p className="text-xs font-medium text-muted uppercase tracking-wide px-1 mt-4 mb-1">
+              <p className="text-xs font-bold text-ink uppercase tracking-wide px-1 mt-4 mb-2">
                 Unmatched Answers ({result.unmatchedAnswers.length})
               </p>
               {result.unmatchedAnswers.map((a) => (
