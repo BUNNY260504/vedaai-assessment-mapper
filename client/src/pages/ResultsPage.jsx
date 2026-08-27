@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { ListChecks, FileText } from "lucide-react";
 import { getExamResult } from "../lib/api.js";
 import QuestionListItem from "../components/QuestionListItem.jsx";
 import AnswerSheetViewer from "../components/AnswerSheetViewer.jsx";
@@ -10,6 +11,7 @@ export default function ResultsPage() {
   const [result, setResult] = useState(null);
   const [selected, setSelected] = useState(null); // { kind: 'question'|'unmatched', item }
   const [loading, setLoading] = useState(true);
+  const [mobileTab, setMobileTab] = useState("questions"); // 'questions' | 'answers'
 
   useEffect(() => {
     getExamResult(id)
@@ -37,11 +39,41 @@ export default function ResultsPage() {
       ? selected.item.answer?.regions || []
       : selected?.item?.regions || [];
 
+  function select(next) {
+    setSelected(next);
+    setMobileTab("answers");
+  }
+
   return (
     <div className="h-full flex flex-col min-h-0">
       <SummaryBar summary={result.summary} />
+
+      <div className="lg:hidden flex border-b border-border bg-card px-4 pt-2 gap-1">
+        {[
+          { key: "questions", label: "Questions", icon: ListChecks },
+          { key: "answers", label: "Answer Sheet", icon: FileText },
+        ].map(({ key, label, icon: Icon }) => (
+          <button
+            key={key}
+            onClick={() => setMobileTab(key)}
+            className={`flex items-center gap-1.5 text-sm font-medium px-3 py-2 border-b-2 transition ${
+              mobileTab === key
+                ? "border-accent text-ink"
+                : "border-transparent text-muted"
+            }`}
+          >
+            <Icon size={15} />
+            {label}
+          </button>
+        ))}
+      </div>
+
       <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[380px_1fr]">
-        <div className="border-r border-border overflow-y-auto p-4 flex flex-col gap-2">
+        <div
+          className={`${
+            mobileTab === "answers" ? "hidden" : ""
+          } lg:block border-r border-border overflow-y-auto p-4 flex-col gap-2 lg:flex`}
+        >
           <p className="text-xs font-medium text-muted uppercase tracking-wide px-1 mb-1">
             Questions ({result.questions.length})
           </p>
@@ -50,7 +82,7 @@ export default function ResultsPage() {
               key={q.id}
               question={q}
               active={selected?.kind === "question" && selected.item.id === q.id}
-              onClick={() => setSelected({ kind: "question", item: q })}
+              onClick={() => select({ kind: "question", item: q })}
             />
           ))}
 
@@ -62,7 +94,7 @@ export default function ResultsPage() {
               {result.unmatchedAnswers.map((a) => (
                 <button
                   key={a.id}
-                  onClick={() => setSelected({ kind: "unmatched", item: a })}
+                  onClick={() => select({ kind: "unmatched", item: a })}
                   className={`w-full text-left rounded-xl border px-3.5 py-3 transition ${
                     selected?.kind === "unmatched" && selected.item.id === a.id
                       ? "border-accent bg-accent-soft/60"
@@ -79,7 +111,16 @@ export default function ResultsPage() {
           )}
         </div>
 
-        <div className="overflow-y-auto bg-surface">
+        <div
+          className={`${
+            mobileTab === "questions" ? "hidden" : ""
+          } lg:block overflow-y-auto bg-surface`}
+        >
+          {selected?.kind === "question" && (
+            <p className="lg:hidden text-xs font-medium text-muted px-4 pt-3">
+              {selected.item.number}
+            </p>
+          )}
           <AnswerSheetViewer
             examId={result.id}
             regions={regions}
