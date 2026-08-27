@@ -5,7 +5,7 @@ A web app for teachers to upload a question paper and a student's handwritten an
 ## Live URL / Repo
 
 - Live URL: _add after deployment_
-- GitHub repo: _add after pushing_
+- GitHub repo: 
 
 ## Approach
 
