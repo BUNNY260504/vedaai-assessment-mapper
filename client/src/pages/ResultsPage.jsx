@@ -284,16 +284,30 @@ export default function ResultsPage() {
         <div
           role="separator"
           aria-orientation="vertical"
-          aria-label="Resize panels"
+          aria-label="Drag to resize panels"
+          title="Drag to resize panels"
           onMouseDown={handleResizeStart}
-          className={`hidden lg:flex w-2.5 shrink-0 cursor-col-resize items-center justify-center transition touch-none ${
-            resizing ? "bg-accent/15" : "hover:bg-accent/10"
-          }`}
+          className="hidden lg:flex relative w-4 shrink-0 cursor-col-resize items-center justify-center group touch-none"
         >
-          <GripVertical
-            size={14}
-            className={`transition ${resizing ? "text-accent" : "text-muted"}`}
+          <div
+            className={`absolute inset-y-0 left-1/2 -translate-x-1/2 w-px transition-colors ${
+              resizing ? "bg-accent" : "bg-border group-hover:bg-accent/60"
+            }`}
           />
+          <div
+            className={`relative z-10 w-5 h-14 rounded-full border flex items-center justify-center shadow-sm transition-colors ${
+              resizing
+                ? "bg-accent border-accent"
+                : "bg-card border-border group-hover:border-accent/60 group-hover:bg-accent-soft/50"
+            }`}
+          >
+            <GripVertical
+              size={13}
+              className={`transition-colors ${
+                resizing ? "text-white" : "text-muted group-hover:text-accent"
+              }`}
+            />
+          </div>
         </div>
 
         <div

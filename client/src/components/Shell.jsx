@@ -271,15 +271,25 @@ export default function Shell({ children }) {
                 </div>
               </div>
             </div>
-            <button
-              className="relative w-9 h-9 rounded-full bg-surface hover:bg-border flex items-center justify-center transition"
-              aria-label="Notifications"
-            >
-              <Bell size={18} className="text-ink" />
-              {hasNotification && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500" />
-              )}
-            </button>
+            <div className="relative group">
+              <button
+                onClick={() => navigate("/library")}
+                className="relative w-9 h-9 rounded-full bg-surface hover:bg-border flex items-center justify-center transition"
+                aria-label="Notifications"
+              >
+                <Bell size={18} className="text-ink" />
+                {hasNotification && (
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500" />
+                )}
+              </button>
+              <div className="pointer-events-none absolute right-0 top-full mt-2 w-64 origin-top-right scale-95 opacity-0 transition-all duration-150 group-hover:scale-100 group-hover:opacity-100 z-20">
+                <div className="bg-ink text-white text-xs leading-relaxed rounded-lg px-3 py-2.5 shadow-lg">
+                  {hasNotification
+                    ? "You have a new save. Click to view it in My Library."
+                    : "Notifications about saved exams show up here. Click to open My Library."}
+                </div>
+              </div>
+            </div>
             <button
               className="w-9 h-9 rounded-full bg-surface hover:bg-border flex items-center justify-center transition"
               aria-label="AI Assistant"
