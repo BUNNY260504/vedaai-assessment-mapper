@@ -38,7 +38,7 @@ export default function QuestionListItem({ question, active, onClick }) {
       onClick={onClick}
       className={`w-full text-left rounded-xl border px-3.5 py-3 transition ${
         active
-          ? "border-accent bg-accent-soft/60"
+          ? "border-accent bg-card"
           : "border-transparent hover:bg-surface"
       }`}
     >
@@ -57,7 +57,7 @@ export default function QuestionListItem({ question, active, onClick }) {
           <StatusBadge question={question} />
         </div>
       </div>
-      <p className="text-xs text-muted line-clamp-2">{question.text}</p>
+      <p className="text-xs font-semibold text-ink line-clamp-2">{question.text}</p>
       {question.needsReview && active && (
         <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5 mt-2">
           The student didn&apos;t label this answer — we matched it by content/position. Double-check the highlighted region is correct.

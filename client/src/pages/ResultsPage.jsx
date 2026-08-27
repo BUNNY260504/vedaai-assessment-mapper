@@ -99,7 +99,7 @@ export default function ResultsPage() {
           } lg:block border-r border-border overflow-y-auto p-4 flex-col gap-2 lg:flex`}
         >
           <p className="text-xs font-medium text-muted uppercase tracking-wide px-1 mb-1">
-            Questions ({result.questions.length})
+            Questions Extracted ({result.questions.length})
           </p>
           {result.questions.map((q) => (
             <QuestionListItem
@@ -121,7 +121,7 @@ export default function ResultsPage() {
                   onClick={() => select({ kind: "unmatched", item: a })}
                   className={`w-full text-left rounded-xl border px-3.5 py-3 transition ${
                     selected?.kind === "unmatched" && selected.item.id === a.id
-                      ? "border-accent bg-accent-soft/60"
+                      ? "border-accent bg-card"
                       : "border-transparent hover:bg-surface"
                   }`}
                 >

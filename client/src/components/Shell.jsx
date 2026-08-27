@@ -12,15 +12,27 @@ import {
   X,
   PanelLeftClose,
   PanelLeftOpen,
+  Home,
 } from "lucide-react";
 
 const NAV = [
-  { label: "Home", icon: LayoutGrid },
+  { label: "Home", icon: LayoutGrid, to: "/" },
   { label: "My Classroom", icon: Users },
   { label: "Assignments", icon: FileText },
-  { label: "Exams", icon: ClipboardList, active: true },
+  { label: "Exams", icon: ClipboardList, to: "/upload" },
   { label: "My Library", icon: Library },
 ];
+
+function isActive(to, pathname) {
+  if (!to) return false;
+  return to === "/" ? pathname === "/" : pathname.startsWith(to);
+}
+
+function backTargetFor(pathname) {
+  if (pathname === "/") return null;
+  if (pathname === "/upload") return "/";
+  return "/upload"; // processing / results pages
+}
 
 function LogoMark() {
   return (
@@ -30,7 +42,7 @@ function LogoMark() {
   );
 }
 
-function NavContent({ collapsed }) {
+function NavContent({ collapsed, pathname, onNavigate }) {
   return (
     <>
       <button
@@ -43,18 +55,37 @@ function NavContent({ collapsed }) {
         {!collapsed && "AI Teacher's Toolkit"}
       </button>
       <nav className="flex flex-col gap-1">
-        {NAV.map(({ label, icon: Icon, active }) => (
-          <div
-            key={label}
-            title={collapsed ? label : undefined}
-            className={`flex items-center rounded-xl text-sm cursor-pointer ${
-              collapsed ? "justify-center w-10 h-10 mx-auto" : "gap-3 px-3 py-2.5"
-            } ${active ? "bg-surface font-medium text-ink" : "text-muted hover:bg-surface/70"}`}
-          >
-            <Icon size={18} className="shrink-0" />
-            {!collapsed && label}
-          </div>
-        ))}
+        {NAV.map(({ label, icon: Icon, to }) => {
+          const active = isActive(to, pathname);
+          const className = `flex items-center rounded-xl text-sm ${
+            collapsed ? "justify-center w-10 h-10 mx-auto" : "gap-3 px-3 py-2.5"
+          } ${
+            active
+              ? "bg-surface font-medium text-ink"
+              : `text-muted ${to ? "hover:bg-surface/70 cursor-pointer" : "cursor-default"}`
+          }`;
+          const content = (
+            <>
+              <Icon size={18} className="shrink-0" />
+              {!collapsed && label}
+            </>
+          );
+          return to ? (
+            <Link
+              key={label}
+              to={to}
+              onClick={onNavigate}
+              title={collapsed ? label : undefined}
+              className={className}
+            >
+              {content}
+            </Link>
+          ) : (
+            <div key={label} title={collapsed ? label : undefined} className={className}>
+              {content}
+            </div>
+          );
+        })}
       </nav>
     </>
   );
@@ -63,12 +94,13 @@ function NavContent({ collapsed }) {
 export default function Shell({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const showBack = location.pathname !== "/";
+  const backTarget = backTargetFor(location.pathname);
+  const headerLabel = location.pathname === "/" ? "Home" : "Exams";
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className="min-h-screen flex bg-surface">
+    <div className="h-screen flex bg-surface overflow-hidden">
       <aside
         className={`hidden md:flex shrink-0 flex-col border-r border-border bg-card py-5 transition-[width] duration-200 ${
           collapsed ? "w-20 px-2" : "w-64 px-4"
@@ -79,7 +111,7 @@ export default function Shell({ children }) {
             collapsed ? "flex-col gap-2" : "justify-between px-2"
           }`}
         >
-          <Link to="/" className="flex items-center gap-2 min-w-0" aria-label="Go to upload page">
+          <Link to="/" className="flex items-center gap-2 min-w-0" aria-label="Go to home page">
             <LogoMark />
             {!collapsed && (
               <span className="font-semibold text-lg tracking-tight truncate">VedaAI</span>
@@ -93,7 +125,7 @@ export default function Shell({ children }) {
             {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
           </button>
         </div>
-        <NavContent collapsed={collapsed} />
+        <NavContent collapsed={collapsed} pathname={location.pathname} />
       </aside>
 
       {drawerOpen && (
@@ -108,7 +140,7 @@ export default function Shell({ children }) {
                 to="/"
                 onClick={() => setDrawerOpen(false)}
                 className="flex items-center gap-2"
-                aria-label="Go to upload page"
+                aria-label="Go to home page"
               >
                 <LogoMark />
                 <span className="font-semibold text-lg tracking-tight">VedaAI</span>
@@ -121,25 +153,29 @@ export default function Shell({ children }) {
                 <X size={18} />
               </button>
             </div>
-            <NavContent collapsed={false} />
+            <NavContent
+              collapsed={false}
+              pathname={location.pathname}
+              onNavigate={() => setDrawerOpen(false)}
+            />
           </aside>
         </div>
       )}
 
       <div className="flex-1 flex flex-col min-w-0">
         <header className="flex items-center gap-3 px-4 md:px-6 py-4 border-b border-border bg-card">
-          {showBack ? (
+          {backTarget ? (
             <button
-              onClick={() => navigate("/")}
+              onClick={() => navigate(backTarget)}
               className="w-9 h-9 flex items-center justify-center rounded-full bg-surface hover:bg-border transition"
               aria-label="Back"
             >
               <ArrowLeft size={18} />
             </button>
           ) : (
-            <ClipboardList size={18} className="text-muted" />
+            <Home size={18} className="text-muted" />
           )}
-          <span className="text-muted font-medium flex-1">Exams</span>
+          <span className="text-muted font-medium flex-1">{headerLabel}</span>
           <button
             onClick={() => setDrawerOpen(true)}
             className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface transition md:hidden"
