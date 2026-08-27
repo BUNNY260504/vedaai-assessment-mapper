@@ -92,7 +92,7 @@ function NavContent({ collapsed, pathname, onNavigate }) {
           } ${
             active
               ? "bg-ink text-white"
-              : `text-muted ${to ? "hover:bg-surface/70 cursor-pointer" : "cursor-default"}`
+              : `text-ink ${to ? "hover:bg-surface/70 cursor-pointer" : "cursor-default"}`
           }`;
           const content = (
             <>
@@ -121,7 +121,7 @@ function NavContent({ collapsed, pathname, onNavigate }) {
       <div className="mt-auto pt-4">
         <div
           title={collapsed ? "Settings" : undefined}
-          className={`flex items-center rounded-xl text-sm font-bold text-muted hover:bg-surface/70 cursor-pointer mb-2 ${
+          className={`flex items-center rounded-xl text-sm font-bold text-ink hover:bg-surface/70 cursor-pointer mb-2 ${
             collapsed ? "justify-center w-10 h-10 mx-auto" : "gap-3 px-3 py-2.5"
           }`}
         >

@@ -10,7 +10,7 @@ export default function SummaryBar({ summary }) {
             {summary.totalMarks}
             <span className="text-muted text-base font-normal">/{summary.maxMarks}</span>
           </p>
-          <p className="text-xs font-bold text-muted mt-1">Total score</p>
+          <p className="text-xs font-bold text-ink mt-1">Total score</p>
         </div>
         <Stat label="Answered" value={`${summary.answeredCount}/${summary.totalQuestions}`} />
         <Stat label="Correct" value={summary.correctCount} tone="text-emerald-600" />
@@ -39,7 +39,7 @@ function Stat({ label, value, tone }) {
   return (
     <div>
       <p className={`text-lg font-semibold leading-none ${tone || ""}`}>{value}</p>
-      <p className="text-xs font-bold text-muted mt-1">{label}</p>
+      <p className="text-xs font-bold text-ink mt-1">{label}</p>
     </div>
   );
 }

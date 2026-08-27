@@ -60,7 +60,7 @@ export default function QuestionListItem({ question, active, expanded, onClick, 
         <div className="min-w-[44px] h-11 px-2 rounded-full bg-accent text-white font-bold flex items-center justify-center shrink-0">
           {question.number}
         </div>
-        <p className="flex-1 min-w-0 text-base font-semibold text-ink leading-snug pt-1.5">
+        <p className="flex-1 min-w-0 text-xs font-semibold text-ink leading-snug pt-2">
           {question.text}
         </p>
         <div className="flex items-center gap-2 shrink-0 pt-1">
