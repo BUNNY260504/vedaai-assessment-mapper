@@ -45,6 +45,25 @@ function backTargetFor(pathname) {
   return "/upload"; // processing / results pages
 }
 
+function helpTextFor(pathname) {
+  if (pathname === "/") {
+    return "This is the home screen. Click \"Upload Question Paper & Answer Sheet\" to grade a new exam.";
+  }
+  if (pathname === "/upload") {
+    return "Upload a question paper and a student's answer sheet (PDF or images), then click Start Mapping to begin AI extraction.";
+  }
+  if (pathname === "/library") {
+    return "Exams you've saved show up here. Click any entry to reopen its graded results.";
+  }
+  if (/^\/exams\/[^/]+\/processing$/.test(pathname)) {
+    return "VedaAI is extracting questions, matching the answer sheet to them, and grading each one — this usually takes under a minute.";
+  }
+  if (/^\/exams\/[^/]+$/.test(pathname)) {
+    return "Click a question on the left to highlight where its answer appears on the right. Use Save to add this result to My Library.";
+  }
+  return "VedaAI helps you extract, map, and grade handwritten answer sheets with AI.";
+}
+
 function LogoMark() {
   return (
     <div className="w-8 h-8 shrink-0 rounded-lg bg-ink flex items-center justify-center text-white font-bold text-sm">
@@ -228,12 +247,19 @@ export default function Shell({ children }) {
           {headerAction}
 
           <div className="hidden md:flex items-center gap-2">
-            <button
-              className="w-9 h-9 rounded-full bg-surface hover:bg-border flex items-center justify-center transition"
-              aria-label="Help"
-            >
-              <HelpCircle size={18} className="text-ink" />
-            </button>
+            <div className="relative group">
+              <button
+                className="w-9 h-9 rounded-full bg-surface hover:bg-border flex items-center justify-center transition"
+                aria-label="Help"
+              >
+                <HelpCircle size={18} className="text-ink" />
+              </button>
+              <div className="pointer-events-none absolute right-0 top-full mt-2 w-64 origin-top-right scale-95 opacity-0 transition-all duration-150 group-hover:scale-100 group-hover:opacity-100 z-20">
+                <div className="bg-ink text-white text-xs leading-relaxed rounded-lg px-3 py-2.5 shadow-lg">
+                  {helpTextFor(location.pathname)}
+                </div>
+              </div>
+            </div>
             <button
               className="relative w-9 h-9 rounded-full bg-surface hover:bg-border flex items-center justify-center transition"
               aria-label="Notifications"

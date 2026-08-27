@@ -28,7 +28,14 @@ export default function ResultsPage() {
   const pendingProceedRef = useRef(null);
   const { setHeaderAction, setBackGuard, markNotified } = usePageActions();
 
+  const extractionDone = result?.status === "done";
+
   useEffect(() => {
+    if (!extractionDone) {
+      setHeaderAction(null);
+      setBackGuard(null);
+      return;
+    }
     setHeaderAction(
       <button
         onClick={() => setShowSaveModal(true)}
@@ -50,7 +57,7 @@ export default function ResultsPage() {
       setHeaderAction(null);
       setBackGuard(null);
     };
-  }, [saved, setHeaderAction, setBackGuard]);
+  }, [extractionDone, saved, setHeaderAction, setBackGuard]);
 
   useEffect(() => {
     getExamResult(id)
