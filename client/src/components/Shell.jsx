@@ -159,7 +159,8 @@ function NavContent({ collapsed, pathname, onNavigate }) {
 export default function Shell({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const backTarget = backTargetFor(location.pathname);
+  const backTarget =
+    location.state?.from === "library" ? "/library" : backTargetFor(location.pathname);
   const headerLabel = HEADER_LABELS[location.pathname] || "Exams";
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);

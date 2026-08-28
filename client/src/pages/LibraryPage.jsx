@@ -37,7 +37,7 @@ export default function LibraryPage() {
         {entries.map((e) => (
           <button
             key={`${e.examId}-${e.savedAt}`}
-            onClick={() => navigate(`/exams/${e.examId}`)}
+            onClick={() => navigate(`/exams/${e.examId}`, { state: { from: "library" } })}
             className="flex items-center justify-between gap-4 bg-card border border-border rounded-xl px-4 py-3.5 text-left hover:border-accent transition"
           >
             <div className="min-w-0">
