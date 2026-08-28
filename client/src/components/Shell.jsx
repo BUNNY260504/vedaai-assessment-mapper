@@ -72,7 +72,7 @@ function LogoMark() {
   );
 }
 
-function NavContent({ collapsed, pathname, onNavigate }) {
+function NavContent({ collapsed, pathname, onNavigate, onToggleCollapse }) {
   return (
     <>
       <button
@@ -119,6 +119,15 @@ function NavContent({ collapsed, pathname, onNavigate }) {
       </nav>
 
       <div className="mt-auto pt-4">
+        {collapsed && (
+          <button
+            onClick={onToggleCollapse}
+            className="w-10 h-10 mx-auto mb-2 flex items-center justify-center rounded-md text-muted hover:bg-surface hover:text-ink transition"
+            aria-label="Expand sidebar"
+          >
+            <PanelLeftOpen size={16} />
+          </button>
+        )}
         <div
           title={collapsed ? "Settings" : undefined}
           className={`flex items-center rounded-xl text-sm font-bold text-ink hover:bg-surface/70 cursor-pointer mb-2 ${
@@ -202,16 +211,11 @@ export default function Shell({ children }) {
             </button>
           )}
         </div>
-        <NavContent collapsed={collapsed} pathname={location.pathname} />
-        {collapsed && (
-          <button
-            onClick={() => setCollapsed((c) => !c)}
-            className="mt-3 w-10 h-10 mx-auto shrink-0 flex items-center justify-center rounded-md text-muted hover:bg-surface hover:text-ink transition"
-            aria-label="Expand sidebar"
-          >
-            <PanelLeftOpen size={16} />
-          </button>
-        )}
+        <NavContent
+          collapsed={collapsed}
+          pathname={location.pathname}
+          onToggleCollapse={() => setCollapsed((c) => !c)}
+        />
       </aside>
 
       {drawerOpen && (
