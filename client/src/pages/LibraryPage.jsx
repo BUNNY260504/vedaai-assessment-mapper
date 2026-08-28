@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Library as LibraryIcon, ArrowRight } from "lucide-react";
-import { getLibrary } from "../lib/library.js";
+import { Library as LibraryIcon, ArrowRight, X } from "lucide-react";
+import { getLibrary, removeFromLibrary } from "../lib/library.js";
 
 export default function LibraryPage() {
   const navigate = useNavigate();
@@ -10,6 +10,11 @@ export default function LibraryPage() {
   useEffect(() => {
     setEntries(getLibrary());
   }, []);
+
+  function handleRemove(e, examId) {
+    e.stopPropagation();
+    setEntries(removeFromLibrary(examId));
+  }
 
   if (entries.length === 0) {
     return (
@@ -44,7 +49,22 @@ export default function LibraryPage() {
                 {new Date(e.savedAt).toLocaleString()}
               </p>
             </div>
-            <ArrowRight size={16} className="text-muted shrink-0" />
+            <div className="flex items-center gap-1 shrink-0">
+              <span
+                role="button"
+                tabIndex={0}
+                onClick={(evt) => handleRemove(evt, e.examId)}
+                onKeyDown={(evt) => {
+                  if (evt.key === "Enter" || evt.key === " ") handleRemove(evt, e.examId);
+                }}
+                aria-label={`Remove ${e.studentName} from My Library`}
+                title="Remove from My Library"
+                className="w-7 h-7 rounded-full flex items-center justify-center text-muted hover:bg-surface hover:text-red-600 transition"
+              >
+                <X size={14} />
+              </span>
+              <ArrowRight size={16} className="text-muted" />
+            </div>
           </button>
         ))}
       </div>

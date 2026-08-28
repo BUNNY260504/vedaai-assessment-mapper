@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   ListChecks,
   FileText,
+  FileX,
   ChevronsDownUp,
   ChevronsUpDown,
   Save,
@@ -84,6 +85,7 @@ export default function ResultsPage() {
           setSelected({ kind: "unmatched", item: data.unmatchedAnswers[0] });
         }
       })
+      .catch(() => setResult(null))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -132,7 +134,33 @@ export default function ResultsPage() {
   }
 
   if (!result) {
-    return <div className="p-8 text-center text-muted">Exam not found.</div>;
+    return (
+      <div className="h-full flex flex-col items-center justify-center text-center p-10">
+        <div className="w-14 h-14 rounded-full bg-surface border border-border flex items-center justify-center mb-4">
+          <FileX size={22} className="text-muted" />
+        </div>
+        <p className="text-base font-semibold mb-1">This exam is no longer available</p>
+        <p className="text-sm text-muted max-w-sm mb-5">
+          Exam data isn&apos;t stored permanently — it&apos;s cleared after a couple of hours
+          or whenever the server restarts. If this was saved in My Library, you can remove
+          the stale entry there.
+        </p>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate("/library")}
+            className="rounded-full bg-ink text-white text-sm font-semibold px-4 py-2 hover:opacity-90 transition"
+          >
+            Go to My Library
+          </button>
+          <button
+            onClick={() => navigate("/upload")}
+            className="rounded-full border border-border text-sm font-semibold px-4 py-2 hover:bg-surface transition"
+          >
+            Upload a new exam
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const regions =

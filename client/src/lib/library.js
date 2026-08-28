@@ -29,3 +29,9 @@ export function saveToLibrary({ examId, studentName, summary }) {
   writeLibrary(entries);
   return entry;
 }
+
+export function removeFromLibrary(examId) {
+  const entries = getLibrary().filter((e) => e.examId !== examId);
+  writeLibrary(entries);
+  return entries;
+}
