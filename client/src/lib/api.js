@@ -12,7 +12,7 @@ export async function uploadExam({ questionFiles, answerFiles }, onProgress) {
       if (onProgress && evt.total) onProgress(Math.round((evt.loaded / evt.total) * 100));
     },
   });
-  return res.data; // { id }
+  return res.data;
 }
 
 export async function getExamStatus(id) {

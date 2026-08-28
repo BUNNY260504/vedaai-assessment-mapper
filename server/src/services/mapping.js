@@ -8,13 +8,10 @@ function normalizeNumber(n) {
 }
 
 function candidateRank(a) {
-  // Prefer explicit labels over inferred guesses, then higher confidence.
   const methodScore = a.matchMethod === "label" ? 1 : 0;
   return methodScore * 10 + (a.confidence ?? 0);
 }
 
-// Matches answers to questions by normalized question number.
-// Returns { questions: [...withAnswer], unmatchedAnswers: [...] }
 export function mapAnswersToQuestions(questions, answers) {
   const byNumber = new Map();
   for (const a of answers) {

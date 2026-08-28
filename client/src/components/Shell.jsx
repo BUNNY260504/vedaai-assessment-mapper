@@ -42,7 +42,7 @@ function isActive(to, pathname) {
 function backTargetFor(pathname) {
   if (pathname === "/") return null;
   if (pathname === "/upload" || pathname === "/library") return "/";
-  return "/upload"; // processing / results pages
+  return "/upload";
 }
 
 function helpTextFor(pathname) {

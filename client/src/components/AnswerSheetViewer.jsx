@@ -15,8 +15,6 @@ export default function AnswerSheetViewer({
   const wrapperRef = useRef(null);
   const pageElsRef = useRef({});
 
-  // Track which page is most visible as the teacher scrolls, so the toolbar's
-  // "Page X of Y" indicator stays in sync automatically.
   useEffect(() => {
     const wrapper = wrapperRef.current;
     const root = wrapper?.closest(".overflow-auto, .overflow-y-auto, .overflow-scroll");
@@ -40,15 +38,12 @@ export default function AnswerSheetViewer({
 
     Object.values(pageElsRef.current).forEach((el) => el && observer.observe(el));
     return () => observer.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageCount]);
 
-  // Explicit "jump to page" commands from the prev/next chevrons.
   useEffect(() => {
     if (!scrollRequest) return;
     const el = pageElsRef.current[scrollRequest.page];
     el?.scrollIntoView({ behavior: "instant", block: "start" });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scrollRequest?.token]);
 
   const pages = Array.from({ length: pageCount || 0 }, (_, i) => i);

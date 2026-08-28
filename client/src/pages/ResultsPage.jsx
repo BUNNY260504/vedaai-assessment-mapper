@@ -23,9 +23,9 @@ export default function ResultsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [result, setResult] = useState(null);
-  const [selected, setSelected] = useState(null); // { kind: 'question'|'unmatched', item }
+  const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [mobileTab, setMobileTab] = useState("questions"); // 'questions' | 'answers'
+  const [mobileTab, setMobileTab] = useState("questions");
   const [zoom, setZoom] = useState(100);
   const [currentPage, setCurrentPage] = useState(0);
   const [scrollRequest, setScrollRequest] = useState(null);
@@ -148,9 +148,6 @@ export default function ResultsPage() {
     setMobileTab("answers");
   }
 
-  // Explicit page jump, used by the prev/next chevrons. Selection-driven
-  // jumps are instead handled by PageWithHighlight itself, which centers on
-  // its own highlight whenever the bbox it receives changes.
   function requestScrollToPage(page) {
     scrollTokenRef.current += 1;
     setScrollRequest({ page, token: scrollTokenRef.current });

@@ -8,13 +8,10 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve(
   "pdfjs-dist/legacy/build/pdf.worker.mjs"
 );
 
-// Needed so pdf.js can substitute glyphs for PDFs that reference the standard
-// 14 fonts without embedding them (common for PDFs not exported from a word processor).
-// pdf.js's Node fetch path reads this as a plain filesystem path (not a file:// URL).
 const STANDARD_FONT_DATA_URL =
   path.join(path.dirname(require.resolve("pdfjs-dist/package.json")), "standard_fonts") + "/";
 
-const RENDER_SCALE = 2.0; // ~144 DPI, good balance of legibility vs payload size
+const RENDER_SCALE = 2.0;
 
 class NodeCanvasFactory {
   create(width, height) {

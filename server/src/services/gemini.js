@@ -13,7 +13,6 @@ function imageParts(pages) {
 }
 
 function pageLabelParts(pages) {
-  // Interleave a text label before each image so the model can cite page indices reliably.
   const parts = [];
   pages.forEach((p, i) => {
     parts.push({ text: `--- PAGE ${i} ---` });
@@ -38,8 +37,6 @@ async function callGemini({ systemInstruction, parts, schema }) {
   return response.text;
 }
 
-// Gemini's JSON mode is very reliable but occasionally truncates or wraps output
-// (e.g. on transient errors); one retry avoids failing an entire exam over a blip.
 async function generateJson({ systemInstruction, parts, schema }) {
   let lastError;
   for (let attempt = 0; attempt < 2; attempt++) {

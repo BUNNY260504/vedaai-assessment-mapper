@@ -3,14 +3,14 @@ const exams = new Map();
 export function createExam(id) {
   const exam = {
     id,
-    status: "uploaded", // uploaded -> extracting -> mapping -> grading -> done -> error
+    status: "uploaded",
     error: null,
-    questionPages: [], // [{ index, width, height, buffer }]
+    questionPages: [],
     answerPages: [],
-    questions: [], // [{ id, number, text, page, bbox, marks }]
-    answers: [], // [{ id, matchedQuestionNumber, regions: [{page, bbox}], text, confidence }]
-    mapping: [], // [{ questionId, answerId | null, status }]
-    grading: null, // { perQuestion: [...], summary: {...} }
+    questions: [],
+    answers: [],
+    mapping: [],
+    grading: null,
     createdAt: Date.now(),
   };
   exams.set(id, exam);
@@ -28,7 +28,6 @@ export function updateExam(id, patch) {
   return exam;
 }
 
-// Basic cleanup: drop exams older than 2 hours to bound memory use.
 setInterval(() => {
   const cutoff = Date.now() - 2 * 60 * 60 * 1000;
   for (const [id, exam] of exams) {
