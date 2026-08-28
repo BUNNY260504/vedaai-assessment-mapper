@@ -129,18 +129,19 @@ function NavContent({ collapsed, pathname, onNavigate }) {
           {!collapsed && "Settings"}
         </div>
         <div
-          title={collapsed ? "Delhi Public School, Bokaro Steel City" : undefined}
+          title={collapsed ? "Mahindra University, Bahadurpally Hyderabad" : undefined}
           className={`bg-surface rounded-2xl ${
             collapsed ? "p-2 flex justify-center" : "flex items-center gap-3 p-3"
           }`}
         >
-          <div className="w-10 h-10 rounded-full bg-white border-2 border-emerald-600 flex items-center justify-center shrink-0">
-            <Shield size={18} className="text-emerald-700" />
+          <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
+            <Shield size={38} className="text-red-600" fill="currentColor" />
+            <span className="absolute text-white font-bold text-[9px] tracking-tight">MU</span>
           </div>
           {!collapsed && (
             <div className="min-w-0">
-              <p className="font-semibold text-sm truncate">Delhi Public School</p>
-              <p className="text-xs text-muted truncate">Bokaro Steel City</p>
+              <p className="font-semibold text-sm truncate">Mahindra University</p>
+              <p className="text-xs text-muted truncate">Bahadurpally Hyderabad</p>
             </div>
           )}
         </div>
