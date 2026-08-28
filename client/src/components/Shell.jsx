@@ -135,7 +135,13 @@ function NavContent({ collapsed, pathname, onNavigate }) {
           }`}
         >
           <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
-            <Shield size={38} className="text-red-600" fill="currentColor" />
+            <Shield
+              size={38}
+              className="text-red-600"
+              fill="currentColor"
+              stroke="#000000"
+              strokeWidth={1.5}
+            />
             <span className="absolute text-white font-bold text-[9px] tracking-tight">MU</span>
           </div>
           {!collapsed && (
