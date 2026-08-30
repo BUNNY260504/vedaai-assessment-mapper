@@ -4,6 +4,19 @@ import { ArrowRight, GraduationCap, AlertCircle } from "lucide-react";
 import FileDropSlot from "../components/FileDropSlot.jsx";
 import { uploadExam } from "../lib/api.js";
 
+function isSameFile(a, b) {
+  return a.name === b.name && a.size === b.size && a.lastModified === b.lastModified;
+}
+
+function findDuplicateFileName(questionFiles, answerFiles) {
+  for (const q of questionFiles) {
+    for (const a of answerFiles) {
+      if (isSameFile(q, a)) return q.name;
+    }
+  }
+  return null;
+}
+
 export default function UploadPage() {
   const navigate = useNavigate();
   const [questionFiles, setQuestionFiles] = useState([]);
@@ -12,7 +25,10 @@ export default function UploadPage() {
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState(null);
 
-  const canStart = questionFiles.length > 0 && answerFiles.length > 0 && !submitting;
+  const duplicateFileName = findDuplicateFileName(questionFiles, answerFiles);
+
+  const canStart =
+    questionFiles.length > 0 && answerFiles.length > 0 && !duplicateFileName && !submitting;
 
   async function handleStart() {
     setSubmitting(true);
@@ -53,6 +69,14 @@ export default function UploadPage() {
             onChange={setAnswerFiles}
           />
         </div>
+
+        {duplicateFileName && (
+          <div className="mt-4 flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2">
+            <AlertCircle size={16} />
+            &quot;{duplicateFileName}&quot; was added to both slots — the question paper and
+            answer sheet must be different files.
+          </div>
+        )}
 
         {error && (
           <div className="mt-4 flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2">
