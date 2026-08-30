@@ -4,7 +4,7 @@ A web app for teachers to upload a question paper and a student's handwritten an
 
 ## Live URL / Repo
 
-- Live URL: _add after deployment_
+- Live URL: [vedaai-assessment-mapper-production.up.railway.app](https://vedaai-assessment-mapper-production.up.railway.app)
 - GitHub repo: [BUNNY260504/vedaai-assessment-mapper](https://github.com/BUNNY260504/vedaai-assessment-mapper)
 
 ## Features
@@ -98,7 +98,9 @@ cd ../server && npm install && npm start   # serves client/dist + API on one por
 
 ## Deployment
 
-`render.yaml` at the repo root defines a single Render web service: it builds the client, installs server dependencies, and starts the Express server (which serves the built client alongside the API on one port). Connect the repo to Render as a Blueprint and set `GEMINI_API_KEY` in the dashboard (`GEMINI_MODEL` is pre-set in the blueprint). No database or second service is required.
+Deployed on **Railway** via `railway.json` at the repo root, which builds the client, installs server dependencies, and starts the Express server (which serves the built client alongside the API on one port — no database or second service required). A minimal root `package.json` exists purely so Railway's Nixpacks builder detects this as a Node project and provisions a Node runtime, since the real `package.json` files live in `client/` and `server/`. Set `GEMINI_API_KEY` and `GEMINI_MODEL` in the service's Variables tab, and generate a public domain under Settings → Networking.
+
+`render.yaml` is also present for deploying to Render instead, using the same build/start commands as a Blueprint.
 
 ## Assumptions & limitations
 
